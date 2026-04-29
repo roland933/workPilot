@@ -9,13 +9,21 @@ use App\Models\TimeEntry;
 
 class Project extends Model
 {
-            public function user()
-        {
-            return $this->belongsTo(User::class);
-        }
+    protected $fillable = [
+            'user_id',
+            'name',
+            'description',
+            'hourly_rate'
+    ];
 
-        public function timeEntries()
-        {
+
+    public function user()
+    {
+            return $this->belongsTo(User::class);
+    }
+
+    public function timeEntries()
+    {
             return $this->hasMany(TimeEntry::class);
-        }
+    }
 }
