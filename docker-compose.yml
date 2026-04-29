@@ -1,0 +1,42 @@
+version: '2.2'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: laravel_app
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+    ports:
+      - "3306:3306"
+
+  frontend:
+    image: node:20
+    container_name: vue_app
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
