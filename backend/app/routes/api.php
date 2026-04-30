@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TimeEntryController;
+use App\Http\Controllers\StatsController;
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -19,5 +21,6 @@ Route::middleware('auth:sanctum')->post('/projects', [ProjectController::class, 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/time/start', [TimeEntryController::class, 'start']);
     Route::post('/time/stop', [TimeEntryController::class, 'stop']);
+    Route::get('/stats', [StatsController::class, 'index']);
 });
 

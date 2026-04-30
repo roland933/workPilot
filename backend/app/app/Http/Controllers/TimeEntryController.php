@@ -49,7 +49,13 @@ public function stop()
 
     $entry->end_time = now();
 
-    $entry->duration = $entry->end_time->diffInSeconds($entry->start_time);
+    $entry->duration = abs($entry->end_time->diffInSeconds($entry->start_time));
+
+    if ($entry->end_time < $entry->start_time) {
+        return response()->json([
+            'error' => 'Invalid time range'
+        ], 400);
+    }
 
     $entry->save();
 
