@@ -9,6 +9,16 @@ use App\Models\User;
 
 class TimeEntry extends Model
 {
+
+        protected $fillable = [
+            'user_id',
+            'project_id',
+            'description',
+            'start_time',
+            'end_time',
+            'duration'
+        ];
+
         public function project()
         {
             return $this->belongsTo(Project::class);
