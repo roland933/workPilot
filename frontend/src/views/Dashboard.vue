@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "../api";
-
+import Chart from "chart.js/auto";
 const stats = ref([]);
 const projects = ref([]);
 const elapsed = ref(0);
+const chartRef = ref(null);
 let interval = null;
 
 const activeTimer = ref(null);
@@ -72,7 +73,30 @@ const stopLiveTimer = () => {
   elapsed.value = 0;
 };
 
-onMounted(loadData);
+
+onMounted(async () => {
+
+  loadData()
+  const res = await api.get("/stats/daily");
+
+  const labels = res.data.map(i => i.date);
+  const data = res.data.map(i => i.hours);
+
+  new Chart(chartRef.value, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Hours",
+          data,
+          borderWidth: 2,
+          tension: 0.3,
+        },
+      ],
+    },
+  });
+});
 
 
 
@@ -83,13 +107,14 @@ onMounted(loadData);
 <template>
   <div class="p-6 bg-gray-100 min-h-screen">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
- 
+    <div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold">Dashboard</h1>
 
+  <span class="text-gray-500">
+    Welcome back 👋
+  </span>
 </div>
-
-    <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
@@ -136,13 +161,13 @@ onMounted(loadData);
       <h2 class="text-xl font-semibold mb-2">Projects</h2>
 
       <div v-for="p in projects" :key="p.id"
-           class="bg-white p-4 mb-2 rounded shadow flex justify-between items-center">
+           class=" hover:shadow-md transition cursor-pointer bg-white p-4 mb-2 rounded shadow flex justify-between items-center">
 
         <span>{{ p.name }}</span>
 
         <div>
           <button
-            class="bg-green-500 text-white px-3 py-1 rounded mr-2"
+            class="hover:bg-green-400 disabled:cursor-not-allowed  disabled:bg-green-200 bg-green-500 text-white px-3 py-1 rounded mr-2"
             :disabled="activeTimer !== null"
             @click="start(p.id)"
           >
@@ -152,7 +177,7 @@ onMounted(loadData);
 
           <button
             :disabled="!activeTimer"
-            class="bg-red-500 text-white px-3 py-1 rounded"
+            class="hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-red-200 bg-red-500 text-white px-3 py-1 rounded"
             @click="stop"
           >
             Stop
@@ -161,6 +186,11 @@ onMounted(loadData);
 
       </div>
     </div>
+
+      <div class="bg-white p-4 rounded-xl shadow mb-6">
+      <h2 class="font-bold mb-2">Daily Hours</h2>
+      <canvas ref="chartRef"></canvas>
+      </div>
 
   </div>
 </template>

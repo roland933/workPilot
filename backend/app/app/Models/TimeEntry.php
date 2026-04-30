@@ -12,6 +12,11 @@ class TimeEntry extends Model
 
        protected $guarded = [];
 
+       protected $casts = [
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+            ];
+
         public function project()
         {
             return $this->belongsTo(Project::class);

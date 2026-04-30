@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/time/stop', [TimeEntryController::class, 'stop']);
     Route::get('/stats', [StatsController::class, 'index']);
     Route::get('/time/active', [TimeEntryController::class, 'active']);
+    Route::get('/stats/daily', [StatsController::class, 'daily']);
 });
 
 

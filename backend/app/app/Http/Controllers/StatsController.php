@@ -34,4 +34,22 @@ class StatsController extends Controller
 
                 return response()->json($projects);
         }
+
+    public function daily() {
+       return TimeEntry::where('user_id', auth()->id())
+                            ->whereNotNull('duration')
+                            ->get()
+                            ->groupBy(function ($entry) {
+                                return $entry->start_time->format('Y-m-d');
+                            })
+                            ->map(function ($entries, $date) {
+                                $seconds = $entries->sum('duration');
+
+                                return [
+                                    'date' => $date,
+                                    'hours' => round($seconds / 3600, 2),
+                                ];
+                            })
+                            ->values();
+        }
 }
