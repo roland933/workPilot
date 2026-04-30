@@ -87,12 +87,14 @@ onMounted(async () => {
     data: {
       labels,
       datasets: [
-        {
-          label: "Hours",
-          data,
-          borderWidth: 2,
-          tension: 0.3,
-        },
+       {
+    label: "Hours",
+    data,
+    borderColor: "#3b82f6",
+    backgroundColor: "rgba(59,130,246,0.2)",
+    fill: true,
+    tension: 0.4,
+  },
       ],
     },
   });
