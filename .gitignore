@@ -1,0 +1,18 @@
+# Node
+node_modules/
+frontend/node_modules/
+
+# Laravel
+vendor/
+backend/vendor/
+
+# Env
+.env
+backend/.env
+
+# Build
+dist/
+frontend/dist/
+
+# OS
+.DS_Store
