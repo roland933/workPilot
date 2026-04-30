@@ -9,6 +9,7 @@ services:
       - ./backend:/var/www
     depends_on:
       - db
+    user: "1000:1000"
 
   nginx:
     image: nginx:alpine
