@@ -22,5 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/time/start', [TimeEntryController::class, 'start']);
     Route::post('/time/stop', [TimeEntryController::class, 'stop']);
     Route::get('/stats', [StatsController::class, 'index']);
+    Route::get('/time/active', [TimeEntryController::class, 'active']);
 });
+
 

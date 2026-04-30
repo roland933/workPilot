@@ -30,8 +30,6 @@ public function start(Request $request)
         'start_time' => now(),
     ]);
 
-
-
     return response()->json($entry);
 }
 
@@ -58,6 +56,16 @@ public function stop()
     }
 
     $entry->save();
+
+    return response()->json($entry);
+}
+
+public function active()
+{
+    $entry = TimeEntry::where('user_id', auth()->id())
+        ->whereNull('end_time')
+        ->with('project')
+        ->first();
 
     return response()->json($entry);
 }
