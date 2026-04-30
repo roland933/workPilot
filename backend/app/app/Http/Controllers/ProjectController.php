@@ -8,10 +8,11 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
-    public function index()
-        {
-            return auth()->user()->projects;
-        }
+   public function index()
+    {   
+        
+        return auth()->user()->projects;
+    }
 
     public function store(Request $request)
         {
@@ -24,4 +25,6 @@ class ProjectController extends Controller
 
             return response()->json($project);
         }
+
+       
 }
