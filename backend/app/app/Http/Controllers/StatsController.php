@@ -52,4 +52,27 @@ class StatsController extends Controller
                             })
                             ->values();
         }
+
+        public function earningsDaily()
+                                        {
+                        return TimeEntry::with('project')
+                            ->where('user_id', auth()->id())
+                            ->whereNotNull('duration')
+                            ->get()
+                            ->groupBy(function ($entry) {
+                                return $entry->start_time->format('Y-m-d');
+                            })
+                            ->map(function ($entries, $date) {
+
+                                $earnings = $entries->sum(function ($entry) {
+                                    return ($entry->duration / 3600) * $entry->project->hourly_rate;
+                                });
+
+                                return [
+                                    'date' => $date,
+                                    'earnings' => round($earnings, 2),
+                                ];
+                            })
+                            ->values();
+                    }
 }

@@ -6,21 +6,31 @@ import api from "../api";
 const email = ref("");
 const password = ref("");
 const router = useRouter();
+const error = ref("");
 
 const login = async () => {
-  const res = await api.post("/login", {
-    email: email.value,
-    password: password.value,
-  });
+  try {
+    const res = await api.post("/login", {
+      email: email.value,
+      password: password.value,
+    });
 
-  localStorage.setItem("token", res.data.token);
-  router.push("/dashboard");
+    localStorage.setItem("token", res.data.token);
+    router.push("/dashboard");
+
+  } catch (err) {
+    error.value = err.response?.data?.message || "Login failed";
+  }
 };
+setTimeout(() => error.value = "", 3000);
 </script>
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="bg-white p-8 rounded-xl shadow-md w-80">
+      <div v-if="error" class="bg-red-100 text-red-700 p-2 mb-3 rounded">
+        {{ error }}
+      </div>
       <h2 class="text-xl font-bold mb-4">Login</h2>
 
       <input

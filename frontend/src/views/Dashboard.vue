@@ -6,11 +6,13 @@ const stats = ref([]);
 const projects = ref([]);
 const elapsed = ref(0);
 const chartRef = ref(null);
+const earningsRef = ref(null);
 let interval = null;
 
 const activeTimer = ref(null);
 
 const loadActive = async () => {
+  try {
   const res = await api.get("/time/active");
   
   activeTimer.value = res.data && res.data.id ? res.data : null;
@@ -18,6 +20,9 @@ const loadActive = async () => {
 
   if (activeTimer.value) {
     startLiveTimer();
+  }
+  }catch(err) {
+    console.log(err);
   }
   
 };
@@ -39,26 +44,38 @@ const formatTime = (sec) => {
 };
 
 const start = async (projectId) => {
+  try {
   await api.post("/time/start", {
     project_id: projectId,
     description: "working",
   });
   await loadData();
   await loadActive();
+
+  
+  }catch(err) {
+    console.log(err);
+  }
+
 };
 
 const stop = async () => {
+  try {
   await api.post("/time/stop");
   
   await loadData();
   await loadActive();
+
+  }catch(err){
+      console.log(err);
+  }
 };
 
 
 const startLiveTimer = () => {
   if (!activeTimer.value) return;
 
- const start = new Date(activeTimer.value.start_time + "Z");
+  const start = new Date(activeTimer.value.start_time + "Z");
 
   interval = setInterval(() => {
     const now = new Date();
@@ -76,11 +93,33 @@ const stopLiveTimer = () => {
 
 onMounted(async () => {
 
-  loadData()
+  
   const res = await api.get("/stats/daily");
 
   const labels = res.data.map(i => i.date);
   const data = res.data.map(i => i.hours);
+
+  const resEarning = await api.get("/stats/earnings");
+  
+  const erningLabels = resEarning.data.map(i => i.date);
+  const earningData = resEarning.data.map(i => i.earnings);
+
+  new Chart(earningsRef.value, {
+    type: "line",
+    data: {
+      labels: erningLabels, // ✅ helyes
+      datasets: [
+        {
+          label: "Earnings", // ✅ ez kell
+          data: earningData,
+          borderColor: "#22c55e",
+          backgroundColor: "rgba(34,197,94,0.2)",
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    },
+  });
 
   new Chart(chartRef.value, {
     type: "line",
@@ -176,7 +215,7 @@ onMounted(async () => {
             Start
           </button>
          
-
+        
           <button
             :disabled="!activeTimer"
             class="hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-red-200 bg-red-500 text-white px-3 py-1 rounded"
@@ -190,8 +229,13 @@ onMounted(async () => {
     </div>
 
       <div class="bg-white p-4 rounded-xl shadow mb-6">
-      <h2 class="font-bold mb-2">Daily Hours</h2>
-      <canvas ref="chartRef"></canvas>
+        <h2 class="font-bold mb-2">Daily Hours</h2>
+        <canvas ref="chartRef"></canvas>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow mb-6">
+          <h2 class="font-bold mb-2">Earnings</h2>
+          <canvas ref="earningsRef"></canvas>
       </div>
 
   </div>
