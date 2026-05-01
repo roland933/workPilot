@@ -16,7 +16,14 @@ class ProjectController
 
     public function store(Request $request)
         {
+
+             $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'hourly_rate' => 'required|numeric|min:0',
+                 ]);
+
             $project = Project::create([
+                ...$validated,    
                 'user_id' => auth()->id(),
                 'name' => $request->name,
                 'description' => $request->description,
@@ -28,10 +35,17 @@ class ProjectController
 
     public function update(Request $request, $id)
      {
+               $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'hourly_rate' => 'required|numeric|min:0',
+                 ]);
+
+
                 $project = Project::where('user_id', auth()->id())
                     ->findOrFail($id);
 
                 $project->update([
+                       ...$validated,    
                     'name' => $request->name,
                     'hourly_rate' => $request->hourly_rate,
                 ]);
