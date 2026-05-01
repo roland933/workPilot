@@ -75,4 +75,27 @@ class StatsController extends Controller
                             })
                             ->values();
                     }
+
+        public function projectBreakdown()
+            {
+                return TimeEntry::with('project')
+                    ->where('user_id', auth()->id())
+                    ->whereNotNull('duration')
+                    ->get()
+                    ->groupBy('project_id')
+                    ->map(function ($entries) {
+
+                        $project = $entries->first()->project;
+
+                        $earnings = $entries->sum(function ($entry) {
+                            return ($entry->duration / 3600) * $entry->project->hourly_rate;
+                        });
+
+                        return [
+                            'project' => $project->name,
+                            'earnings' => round($earnings, 2),
+                        ];
+                    })
+                    ->values();
+            }            
 }

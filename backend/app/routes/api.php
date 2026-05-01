@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/time/active', [TimeEntryController::class, 'active']);
     Route::get('/stats/daily', [StatsController::class, 'daily']);
     Route::get('/stats/earnings', [StatsController::class, 'earningsDaily']);
+    Route::get('/stats/projects', [StatsController::class, 'projectBreakdown']);
 });
 
 

@@ -13,7 +13,7 @@ const login = async () => {
     const res = await api.post("/login", {
       email: email.value,
       password: password.value,
-    });
+    },{ skipGlobalError: true });
 
     localStorage.setItem("token", res.data.token);
     router.push("/dashboard");

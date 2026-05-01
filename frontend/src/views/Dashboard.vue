@@ -1,12 +1,15 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "../api";
-import Chart from "chart.js/auto";
+import EarningsChart from "../components/Charts/ EarningsChart.vue";
+import HoursChart from "../components/Charts/HoursChart.vue";
+import ProjectList from "../components/Projects/ProjectList.vue";
+import PieChart from "../components/Charts/PieChart.vue";
+import { setError } from "../stores/error";
+
 const stats = ref([]);
 const projects = ref([]);
 const elapsed = ref(0);
-const chartRef = ref(null);
-const earningsRef = ref(null);
 let interval = null;
 
 const activeTimer = ref(null);
@@ -44,38 +47,36 @@ const formatTime = (sec) => {
 };
 
 const start = async (projectId) => {
-  try {
+ 
   await api.post("/time/start", {
     project_id: projectId,
     description: "working",
+  }).catch(() => {
+       setError("Nem sikerült elindítani a timert");
   });
   await loadData();
   await loadActive();
 
   
-  }catch(err) {
-    console.log(err);
-  }
-
 };
 
 const stop = async () => {
-  try {
-  await api.post("/time/stop");
+ 
+  await api.post("/time/stop").catch((e) =>{
+       setError("Nem sikerült a timert leállítani");
+  });
   
   await loadData();
   await loadActive();
 
-  }catch(err){
-      console.log(err);
-  }
+ 
 };
 
 
 const startLiveTimer = () => {
   if (!activeTimer.value) return;
 
-  const start = new Date(activeTimer.value.start_time + "Z");
+  const start = new Date(activeTimer.value.start_time);
 
   interval = setInterval(() => {
     const now = new Date();
@@ -93,69 +94,20 @@ const stopLiveTimer = () => {
 
 onMounted(async () => {
 
-  
-  const res = await api.get("/stats/daily");
+  await loadData();
 
-  const labels = res.data.map(i => i.date);
-  const data = res.data.map(i => i.hours);
-
-  const resEarning = await api.get("/stats/earnings");
-  
-  const erningLabels = resEarning.data.map(i => i.date);
-  const earningData = resEarning.data.map(i => i.earnings);
-
-  new Chart(earningsRef.value, {
-    type: "line",
-    data: {
-      labels: erningLabels, // ✅ helyes
-      datasets: [
-        {
-          label: "Earnings", // ✅ ez kell
-          data: earningData,
-          borderColor: "#22c55e",
-          backgroundColor: "rgba(34,197,94,0.2)",
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    },
-  });
-
-  new Chart(chartRef.value, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-       {
-    label: "Hours",
-    data,
-    borderColor: "#3b82f6",
-    backgroundColor: "rgba(59,130,246,0.2)",
-    fill: true,
-    tension: 0.4,
-  },
-      ],
-    },
-  });
 });
-
-
-
 
 
 </script>
 
 <template>
-  <div class="p-6 bg-gray-100 min-h-screen">
+  <div class="p-6 min-h-screen">
 
 
     <div class="flex justify-between items-center mb-6">
-  <h1 class="text-2xl font-bold">Dashboard</h1>
-
-  <span class="text-gray-500">
-    Welcome back 👋
-  </span>
-</div>
+         <h1 class="text-2xl font-bold">Dashboard</h1>
+    </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
@@ -169,12 +121,16 @@ onMounted(async () => {
     <h2 class="text-2xl font-bold text-green-600">$250</h2>
   </div>
 
-  <div class="bg-white p-4 rounded-xl shadow">
-    <p class="text-gray-500">Active Timer</p>
-    <h2 class="text-xl font-bold text-yellow-500">
-      {{ activeTimer ? formatTime(elapsed) : "No active timer" }}
-    </h2>
-  </div>
+ <div v-if="activeTimer"
+     class="bg-yellow-50 border border-yellow-200 p-4 rounded-2xl mb-6">
+
+  <p class="text-sm text-yellow-700">Active Timer</p>
+  <h3 class="font-bold">{{ activeTimer.project.name }}</h3>
+
+  <p class="text-xl font-mono mt-1">
+    {{ formatTime(elapsed) }}
+  </p>
+</div>
 
 </div>
 
@@ -198,45 +154,49 @@ onMounted(async () => {
     </div>
 
     <!-- PROJECTS -->
+
+        <div class="bg-white rounded-2xl shadow-sm p-4 mb-5">
+
+  <h2 class="font-semibold mb-4">Projects</h2>
+
+  <div v-for="p in projects"
+       class="flex justify-between items-center py-3 border-b last:border-none">
+
     <div>
-      <h2 class="text-xl font-semibold mb-2">Projects</h2>
-
-      <div v-for="p in projects" :key="p.id"
-           class=" hover:shadow-md transition cursor-pointer bg-white p-4 mb-2 rounded shadow flex justify-between items-center">
-
-        <span>{{ p.name }}</span>
-
-        <div>
-          <button
-            class="hover:bg-green-400 disabled:cursor-not-allowed  disabled:bg-green-200 bg-green-500 text-white px-3 py-1 rounded mr-2"
-            :disabled="activeTimer !== null"
-            @click="start(p.id)"
-          >
-            Start
-          </button>
-         
-        
-          <button
-            :disabled="!activeTimer"
-            class="hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-red-200 bg-red-500 text-white px-3 py-1 rounded"
-            @click="stop"
-          >
-            Stop
-          </button>
-        </div>
-
-      </div>
+      <p class="font-medium">{{ p.name }}</p>
+      <p class="text-sm text-gray-500">
+        ${{ p.hourly_rate }}/hour
+      </p>
     </div>
 
-      <div class="bg-white p-4 rounded-xl shadow mb-6">
-        <h2 class="font-bold mb-2">Daily Hours</h2>
-        <canvas ref="chartRef"></canvas>
+    <div class="space-x-2">
+      <button
+        @click="start(p.id)"
+        class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+        :disabled="activeTimer"
+      >
+        Start
+      </button>
+
+      <button
+        @click="stop"
+        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+      >
+        Stop
+      </button>
+    </div>
+
+  </div>
+
+</div>
+      
+
+      <div class="space-y-6">
+          <EarningsChart />
+          <HoursChart />
+          <PieChart />
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow mb-6">
-          <h2 class="font-bold mb-2">Earnings</h2>
-          <canvas ref="earningsRef"></canvas>
-      </div>
-
+  
   </div>
 </template>
