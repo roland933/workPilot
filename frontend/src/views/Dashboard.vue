@@ -95,25 +95,11 @@ onMounted(async () => {
     <h2 class="text-2xl font-bold text-green-600">$250</h2>
   </div>
 
- <div v-if="activeTimer"
-     class="bg-yellow-50 border border-yellow-200 p-4 rounded-2xl mb-6">
 
-  <p class="text-sm text-yellow-700">Active Timer</p>
-  <h3 class="font-bold">{{ activeTimer.project.name }}</h3>
-
-  <p class="text-xl font-mono mt-1">
-    {{ formatTime(elapsed) }}
-  </p>
-</div>
 
 </div>
 
-<div v-if="activeTimer" class="bg-yellow-100 p-4 rounded-xl mb-6 shadow">
-  <h3 class="font-semibold">
-    ⏱️ {{ activeTimer.project.name }}
-  </h3>
-  <p class="text-xl font-bold">{{ formatTime(elapsed) }}</p>
-</div>
+
 
     <!-- STATS -->
     <div class="mb-8">

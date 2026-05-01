@@ -16,9 +16,9 @@ Route::middleware('auth:sanctum')->get('/projects', [ProjectController::class, '
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return $request->user();
 });
-Route::middleware('auth:sanctum')->post('/projects', [ProjectController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/projects', [ProjectController::class, 'store']);
     Route::post('/time/start', [TimeEntryController::class, 'start']);
     Route::post('/time/stop', [TimeEntryController::class, 'stop']);
     Route::get('/stats', [StatsController::class, 'index']);
@@ -26,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/stats/daily', [StatsController::class, 'daily']);
     Route::get('/stats/earnings', [StatsController::class, 'earningsDaily']);
     Route::get('/stats/projects', [StatsController::class, 'projectBreakdown']);
+    Route::put('/projects/{id}', [ProjectController::class, 'update']);
+    Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
 });
 
 

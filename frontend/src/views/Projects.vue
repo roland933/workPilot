@@ -1,19 +1,55 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import api from "../api";
+import ProjectCreateModal from "../components/Projects/ProjectCreateModal.vue";
+import ProjectEditModal from "../components/Projects/ProjectEditModal.vue";
+import {setError} from "../stores/error.js"
 
 const projects = ref([]);
 
 const activeTimer = ref(null);
 
 const showModal = ref(false);
+const showEditModal = ref(false);
+
+const elapsed = ref(0);
+
+const editProject = ref(null)
+
+let interval = null;
+
+const formatTime = (sec) => {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+
+  return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
+
+const startLiveTimer = () => {
+  if (!activeTimer.value) return;
+
+  const start = new Date(activeTimer.value.start_time);
+
+  interval = setInterval(() => {
+    const now = new Date();
+    elapsed.value = Math.floor((now - start) / 1000);
+  }, 1000);
+};
+
+const stopLiveTimer = () => {
+  clearInterval(interval);
+  elapsed.value = 0;
+};
 
 const loadActive = async () => {
   try {
   const res = await api.get("/time/active");
-  
+ 
+
   activeTimer.value = res.data && res.data.id ? res.data : null;
-   stopLiveTimer();
+  stopLiveTimer();
+  console.log(activeTimer.value)
 
   if (activeTimer.value) {
     startLiveTimer();
@@ -31,7 +67,6 @@ const load = async () => {
 
 const deleteProject = async (id) => {
   if (!confirm("Delete project?")) return;
-
   await api.delete(`/projects/${id}`);
   load();
 };
@@ -60,29 +95,40 @@ const stop = async () => {
   await load();
   await loadActive();
 
- 
 };
 
-const form = ref({
-  name: "",
-  hourly_rate: ""
-});
+const handleEditProject = (p) => {
+    showEditModal.value = true;
+    editProject.value = p;
+}
 
-const createProject = async () => {
-  await api.post("/projects", form.value);
 
-  showModal.value = false;
-  form.value = { name: "", hourly_rate: "" };
 
-  load();
-};
 
 onMounted(load);
+
+
 </script>
 
 <template>
-  <div class="space-y-6">
 
+       <Teleport to="body">
+          <ProjectCreateModal  v-model="showModal" @load="load" />
+          <ProjectEditModal  v-model="showEditModal" @load="load" :item="editProject"/>
+    </Teleport>
+
+  <div class="space-y-6">
+       <div v-if="activeTimer"
+            class="bg-yellow-50 border border-yellow-200 p-4 rounded-2xl mb-6">
+
+            <p class="text-sm text-yellow-700">Active Timer</p>
+            <h3 class="font-bold">{{ activeTimer.project.name }}</h3>
+
+            <p class="text-xl font-mono mt-1">
+              {{ formatTime(elapsed) }}
+            </p>
+        </div>
+ 
     <h1 class="text-2xl font-bold">Projects</h1>
 
 
@@ -93,29 +139,7 @@ onMounted(load);
       + New Project
     </button>
 
-      <div v-if="showModal" class="fixed inset-0 bg-black/30 flex items-center justify-center">
-
-  <div class="bg-white p-6 rounded-xl w-80">
-
-    <h2 class="font-bold mb-4">New Project</h2>
-
-    <input v-model="form.name" placeholder="Name"
-           class="w-full mb-2 p-2 border rounded" />
-
-    <input v-model="form.hourly_rate" placeholder="Rate"
-           class="w-full mb-4 p-2 border rounded" />
-
-    <div class="flex justify-end gap-2">
-      <button @click="showModal = false">Cancel</button>
-      <button @click="createProject"
-              class="bg-blue-500 text-white px-3 py-1 rounded">
-        Save
-      </button>
-    </div>
-
-  </div>
-
-</div>
+      
 
     <div class="bg-white rounded-xl shadow p-4">
 
@@ -130,15 +154,23 @@ onMounted(load);
         </div>
 
         <div class="space-x-2">
-          <button class="bg-green-500 text-white px-2 py-1 rounded">
+          <button @click="start(p.id)" class="bg-green-500 text-white px-2 py-1 rounded">
             Start
           </button>
 
-          <button class="bg-yellow-500 text-white px-2 py-1 rounded">
+          <button @click="stop" class="bg-red-500 text-white px-2 py-1 rounded">
+            Stop
+          </button>
+
+          <button
+          :disabled="p.id == activeTimer?.project?.id"
+          @click="handleEditProject(p)" 
+          class="bg-yellow-500 text-white px-2 py-1 rounded">
             Edit
           </button>
 
           <button
+            :disabled="p.id == activeTimer?.project?.id"
             @click="deleteProject(p.id)"
             class="bg-red-500 text-white px-2 py-1 rounded"
           >

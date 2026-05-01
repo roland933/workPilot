@@ -26,5 +26,28 @@ class ProjectController
             return response()->json($project);
         }
 
+    public function update(Request $request, $id)
+     {
+                $project = Project::where('user_id', auth()->id())
+                    ->findOrFail($id);
+
+                $project->update([
+                    'name' => $request->name,
+                    'hourly_rate' => $request->hourly_rate,
+                ]);
+
+                return response()->json($project);
+      }
+
+      public function destroy($id)
+        {
+                $project = Project::where('user_id', auth()->id())
+                    ->findOrFail($id);
+
+                $project->delete();
+
+                return response()->json(['message' => 'Deleted']);
+        }
+
        
 }
