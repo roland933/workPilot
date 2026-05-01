@@ -46,31 +46,6 @@ const formatTime = (sec) => {
   return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 };
 
-const start = async (projectId) => {
- 
-  await api.post("/time/start", {
-    project_id: projectId,
-    description: "working",
-  }).catch(() => {
-       setError("Nem sikerült elindítani a timert");
-  });
-  await loadData();
-  await loadActive();
-
-  
-};
-
-const stop = async () => {
- 
-  await api.post("/time/stop").catch((e) =>{
-       setError("Nem sikerült a timert leállítani");
-  });
-  
-  await loadData();
-  await loadActive();
-
- 
-};
 
 
 const startLiveTimer = () => {
@@ -103,7 +78,6 @@ onMounted(async () => {
 
 <template>
   <div class="p-6 min-h-screen">
-
 
     <div class="flex justify-between items-center mb-6">
          <h1 class="text-2xl font-bold">Dashboard</h1>
@@ -152,43 +126,6 @@ onMounted(async () => {
         <p class="text-green-600">Earnings: ${{ item.earnings }}</p>
       </div>
     </div>
-
-    <!-- PROJECTS -->
-
-        <div class="bg-white rounded-2xl shadow-sm p-4 mb-5">
-
-  <h2 class="font-semibold mb-4">Projects</h2>
-
-  <div v-for="p in projects"
-       class="flex justify-between items-center py-3 border-b last:border-none">
-
-    <div>
-      <p class="font-medium">{{ p.name }}</p>
-      <p class="text-sm text-gray-500">
-        ${{ p.hourly_rate }}/hour
-      </p>
-    </div>
-
-    <div class="space-x-2">
-      <button
-        @click="start(p.id)"
-        class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-        :disabled="activeTimer"
-      >
-        Start
-      </button>
-
-      <button
-        @click="stop"
-        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-      >
-        Stop
-      </button>
-    </div>
-
-  </div>
-
-</div>
       
 
       <div class="space-y-6">

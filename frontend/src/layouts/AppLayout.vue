@@ -41,7 +41,7 @@ const userEmail = "demo@email.com";
     <div class="flex-1 flex flex-col">
 
       <!-- HEADER -->
-      <header class="bg-white h-16 shadow-sm">
+      <header class="bg-gray-100 h-16 shadow-md">
 
         <div class="max-w-6xl mx-auto flex items-center justify-between h-full px-6">
 

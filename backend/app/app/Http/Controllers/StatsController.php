@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TimeEntry;
 
-class StatsController extends Controller
+class StatsController
 {
     public function index()
         {
