@@ -79,21 +79,27 @@ onMounted(async () => {
 <template>
   <div class="p-6 min-h-screen">
 
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between mb-6">
          <h1 class="text-2xl font-bold">Dashboard</h1>
     </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
-  <div class="bg-white p-4 rounded-xl shadow">
-    <p class="text-gray-500">Total Hours</p>
-    <h2 class="text-2xl font-bold">12.5</h2>
-  </div>
+      <div class="bg-white p-4 rounded-md shadow">
+        <p class="text-gray-500">Total Hours</p>
+        <h2 class="text-2xl font-bold">12.5</h2>
+      </div>
 
-  <div class="bg-white p-4 rounded-xl shadow">
-    <p class="text-gray-500">Earnings</p>
-    <h2 class="text-2xl font-bold text-green-600">$250</h2>
-  </div>
+      <div class="bg-white p-4 rounded-md shadow">
+        <p class="text-gray-500">Earnings</p>
+        <h2 class="text-2xl font-bold text-green-600">$250</h2>
+      </div>
+
+      <div class="bg-white p-4 rounded-md shadow">
+        <p class="text-gray-500">Total project</p>
+        <h2 class="text-2xl font-bold">5</h2>
+      </div>
+
 
 
 
