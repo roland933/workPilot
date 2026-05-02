@@ -22,10 +22,9 @@ const loadStatsData = async () => {
 };
 
 const loadSummary = async () => {
-
+ loading.value=true
   try {
   const res = await api.get("/stats/summary");
-  loading.value=true
   summary.value = res.data;
   }catch(e){
     setError('Nem sikerült a statisztika lekérése!')
@@ -55,18 +54,27 @@ onMounted(async () => {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
       <div class="bg-white p-4 rounded-md shadow">
-        <p class="text-gray-500">Total Hours</p>
-        <h2 class="text-2xl font-bold">{{ summary.hours }}</h2>
+          <div v-if="loading">Loading...</div>
+          <div v-else>
+            <p class="text-gray-500">Total Hours</p>
+            <h2 class="text-2xl font-bold">{{ summary.hours }}</h2>
+        </div>
       </div>
 
       <div class="bg-white p-4 rounded-md shadow">
+      <div v-if="loading">Loading...</div>
+        <div v-else>
         <p class="text-gray-500">Earnings</p>
         <h2 class="text-2xl font-bold text-green-600">{{ formatMoney(summary.earnings) }}</h2>
+        </div>
       </div>
 
       <div class="bg-white p-4 rounded-md shadow">
-        <p class="text-gray-500">Total project</p>
-        <h2 class="text-2xl font-bold">  {{ summary.projects }}</h2>
+        <div v-if="loading">Loading...</div>
+         <div v-else>
+          <p class="text-gray-500">Total project</p>
+          <h2 class="text-2xl font-bold">  {{ summary.projects }}</h2>
+        </div>
       </div>
 
 </div>
@@ -87,9 +95,11 @@ onMounted(async () => {
       
 
       <div class="space-y-6">
+         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <EarningsChart />
           <HoursChart />
           <PieChart />
+          </div>
       </div>
 
   

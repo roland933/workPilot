@@ -31,7 +31,9 @@ const userEmail = "demo@email.com";
           Dashboard
         </router-link>
 
-        <router-link to="/projects"
+        <router-link 
+          to="/projects"
+           :class="$route.path === '/projects'  ? 'bg-gray-700' : 'hover:bg-gray-700' "
           class="block px-3 py-2 rounded hover:bg-gray-700">
           Projects
         </router-link>
