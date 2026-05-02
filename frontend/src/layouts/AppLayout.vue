@@ -24,7 +24,9 @@ const userEmail = "demo@email.com";
       </div>
 
       <nav class="flex-1 p-4 space-y-2">
-        <router-link to="/dashboard"
+        <router-link 
+          to="/dashboard"
+          :class="$route.path === '/dashboard'  ? 'bg-gray-700' : 'hover:bg-gray-700' "
           class="block px-3 py-2 rounded hover:bg-gray-700">
           Dashboard
         </router-link>

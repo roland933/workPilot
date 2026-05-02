@@ -14,7 +14,8 @@ const showEditModal = ref(false);
 
 const elapsed = ref(0);
 
-const editProject = ref(null)
+const editProject = ref(null);
+const loadingBtn = ref(false);
 
 let interval = null;
 
@@ -62,6 +63,7 @@ const deleteProject = async (id) => {
 
 
 const start = async (projectId) => {
+  loadingBtn.value = true;
   try {
     const res = await api.post("/time/start", {
       project_id: projectId,
@@ -72,18 +74,25 @@ const start = async (projectId) => {
 
   } catch {
     setError("Nem sikerült elindítani a timert");
+  } finally {
+    loadingBtn.value = false
   }
 
   await load();
 };
 
-const stop = async () => {
+const stop = async (projectId) => {
+   loadingBtn.value = true;
   try {
-    await api.post("/time/stop");
+    await api.post("/time/stop",{
+       project_id: projectId,
+    });
     activeTimer.value = null; 
     stopLiveTimer()
-  } catch {
+  } catch(e) {
     setError("Nem sikerült a timert leállítani");
+  }finally{
+     loadingBtn.value = false
   }
 
   await load();
@@ -144,9 +153,11 @@ onMounted(async() => {
       + New Project
     </button>
 
-      
+    <div v-if="projects.length === 0" class="text-gray-500">
+      No projects yet. Create your first one
+    </div>    
 
-    <div class="bg-white rounded-xl shadow p-4">
+    <div class="bg-white rounded-xl shadow p-4" v-else>
 
       <div v-for="p in projects" :key="p.id"
            class="flex justify-between items-center py-3 border-b">
@@ -167,7 +178,7 @@ onMounted(async() => {
 
           <button 
           :disabled="!activeTimer"
-          @click="stop" class="bg-red-500 text-white px-2 py-1 rounded disabled:bg-red-400">
+          @click="stop(p.id)" class="bg-red-500 text-white px-2 py-1 rounded disabled:bg-red-400">
             Stop
           </button>
 

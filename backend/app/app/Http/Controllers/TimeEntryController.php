@@ -33,7 +33,7 @@ public function start(Request $request)
     return response()->json($entry);
 }
 
-public function stop()
+public function stop(Request $request)
 {
     $entry = TimeEntry::where('user_id', auth()->id())
         ->whereNull('end_time')
@@ -44,6 +44,14 @@ public function stop()
             'error' => 'No active timer'
         ], 400);
     }
+
+   if($entry->project_id !== $request->input('project_id')) {
+          return response()->json([
+            'error' => 'Invalid project'
+        ], 400);
+
+   }
+
 
     $entry->end_time = now();
 

@@ -15,18 +15,22 @@ const summary = ref({
 });
 
 const stats = ref();
-
+const loading = ref(true);
 const loadStatsData = async () => {
   const statsRes = await api.get("/stats");
   stats.value = statsRes.data;
 };
 
 const loadSummary = async () => {
+
   try {
   const res = await api.get("/stats/summary");
+  loading.value=true
   summary.value = res.data;
   }catch(e){
     setError('Nem sikerült a statisztika lekérése!')
+  }finally{
+    loading.value=false
   }
 };
 
