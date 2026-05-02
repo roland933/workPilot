@@ -1,13 +1,13 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted,watch } from "vue";
 import api from "../api";
 import ProjectCreateModal from "../components/Projects/ProjectCreateModal.vue";
 import ProjectEditModal from "../components/Projects/ProjectEditModal.vue";
 import {setError} from "../stores/error.js"
+import { activeTimer, loadActiveTimer } from "../stores/timer";
+
 
 const projects = ref([]);
-
-const activeTimer = ref(null);
 
 const showModal = ref(false);
 const showEditModal = ref(false);
@@ -27,9 +27,11 @@ const formatTime = (sec) => {
 };
 
 const startLiveTimer = () => {
-  if (!activeTimer.value) return;
+  if (!activeTimer.value || !activeTimer.value.start_time) return;
 
   const start = new Date(activeTimer.value.start_time);
+
+   if (isNaN(start)) return;
 
   interval = setInterval(() => {
     const now = new Date();
@@ -38,27 +40,14 @@ const startLiveTimer = () => {
 };
 
 const stopLiveTimer = () => {
-  clearInterval(interval);
+  if (interval) {
+    clearInterval(interval);
+    interval = null;
+  }
   elapsed.value = 0;
 };
 
-const loadActive = async () => {
-  try {
-  const res = await api.get("/time/active");
- 
 
-  activeTimer.value = res.data && res.data.id ? res.data : null;
-  stopLiveTimer();
-  console.log(activeTimer.value)
-
-  if (activeTimer.value) {
-    startLiveTimer();
-  }
-  }catch(err) {
-    console.log(err);
-  }
-  
-};
 
 const load = async () => {
   const res = await api.get("/projects");
@@ -73,28 +62,31 @@ const deleteProject = async (id) => {
 
 
 const start = async (projectId) => {
- 
-  await api.post("/time/start", {
-    project_id: projectId,
-    description: "working",
-  }).catch(() => {
-       setError("Nem sikerült elindítani a timert");
-  });
-  await load();
-  await loadActive();
+  try {
+    const res = await api.post("/time/start", {
+      project_id: projectId,
+      description: "working",
+    });
 
-  
+    activeTimer.value = res.data; 
+
+  } catch {
+    setError("Nem sikerült elindítani a timert");
+  }
+
+  await load();
 };
 
 const stop = async () => {
- 
-  await api.post("/time/stop").catch((e) =>{
-       setError("Nem sikerült a timert leállítani");
-  });
-  
-  await load();
-  await loadActive();
+  try {
+    await api.post("/time/stop");
+    activeTimer.value = null; 
+    stopLiveTimer()
+  } catch {
+    setError("Nem sikerült a timert leállítani");
+  }
 
+  await load();
 };
 
 const handleEditProject = (p) => {
@@ -102,10 +94,23 @@ const handleEditProject = (p) => {
     editProject.value = p;
 }
 
+watch(activeTimer, (newVal) => {
+  stopLiveTimer();
+
+  if (newVal && newVal.start_time) {
+    startLiveTimer();
+  }
+});
+
+onMounted(async() => {
+  await load();
+  await loadActiveTimer();
 
 
-
-onMounted(load);
+  if (activeTimer.value) {
+    startLiveTimer(); 
+  }
+});
 
 
 </script>
@@ -118,11 +123,11 @@ onMounted(load);
     </Teleport>
 
   <div class="space-y-6">
-       <div v-if="activeTimer"
+       <div v-if="activeTimer && activeTimer.id"
             class="bg-yellow-50 border border-yellow-200 p-4 rounded-2xl mb-6">
 
             <p class="text-sm text-yellow-700">Active Timer</p>
-            <h3 class="font-bold">{{ activeTimer.project.name }}</h3>
+            <h3 class="font-bold">{{ activeTimer?.project?.name }}</h3>
 
             <p class="text-xl font-mono mt-1">
               {{ formatTime(elapsed) }}
@@ -154,11 +159,15 @@ onMounted(load);
         </div>
 
         <div class="space-x-2">
-          <button @click="start(p.id)" class="bg-green-500 text-white px-2 py-1 rounded">
+          <button 
+          :disabled="activeTimer && activeTimer?.id"
+          @click="start(p.id)" class="bg-green-500 text-white px-2 py-1 rounded disabled:bg-green-300">
             Start
           </button>
 
-          <button @click="stop" class="bg-red-500 text-white px-2 py-1 rounded">
+          <button 
+          :disabled="!activeTimer"
+          @click="stop" class="bg-red-500 text-white px-2 py-1 rounded disabled:bg-red-400">
             Stop
           </button>
 
@@ -170,9 +179,9 @@ onMounted(load);
           </button>
 
           <button
-            :disabled="p.id == activeTimer?.project?.id"
+           :disabled="activeTimer && activeTimer?.id"
             @click="deleteProject(p.id)"
-            class="bg-red-500 text-white px-2 py-1 rounded"
+            class="bg-red-500 text-white px-2 py-1 rounded disabled:bg-red-400"
           >
             Delete
           </button>
