@@ -45,9 +45,9 @@ const userEmail = "demo@email.com";
 
         <div class="max-w-6xl mx-auto flex items-center justify-between h-full px-6">
 
-          <h1 class="font-semibold text-lg">
-            Dashboard
-          </h1>
+          <div >
+           
+          </div>
 
           <!-- USER -->
           <div class="relative">

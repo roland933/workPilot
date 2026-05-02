@@ -6,70 +6,35 @@ import HoursChart from "../components/Charts/HoursChart.vue";
 import ProjectList from "../components/Projects/ProjectList.vue";
 import PieChart from "../components/Charts/PieChart.vue";
 import { setError } from "../stores/error";
+import { formatMoney } from "../js/utils/utils";
 
-const stats = ref([]);
-const projects = ref([]);
-const elapsed = ref(0);
-let interval = null;
+const summary = ref({
+  hours: 0,
+  earnings: 0,
+  projects: 0
+});
 
-const activeTimer = ref(null);
+const stats = ref();
 
-const loadActive = async () => {
-  try {
-  const res = await api.get("/time/active");
-  
-  activeTimer.value = res.data && res.data.id ? res.data : null;
-   stopLiveTimer();
-
-  if (activeTimer.value) {
-    startLiveTimer();
-  }
-  }catch(err) {
-    console.log(err);
-  }
-  
-};
-
-const loadData = async () => {
+const loadStatsData = async () => {
   const statsRes = await api.get("/stats");
   stats.value = statsRes.data;
-
-  const projRes = await api.get("/projects");
-  projects.value = projRes.data;
 };
 
-const formatTime = (sec) => {
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-
-  return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-};
-
-
-
-const startLiveTimer = () => {
-  if (!activeTimer.value) return;
-
-  const start = new Date(activeTimer.value.start_time);
-
-  interval = setInterval(() => {
-    const now = new Date();
-    elapsed.value = Math.floor((now - start) / 1000);
-
-  
-  }, 1000);
-};
-
-const stopLiveTimer = () => {
-  clearInterval(interval);
-  elapsed.value = 0;
+const loadSummary = async () => {
+  try {
+  const res = await api.get("/stats/summary");
+  summary.value = res.data;
+  }catch(e){
+    setError('Nem sikerült a statisztika lekérése!')
+  }
 };
 
 
 onMounted(async () => {
 
-  await loadData();
+  await loadStatsData();
+  await loadSummary();
 
 });
 
@@ -87,21 +52,18 @@ onMounted(async () => {
 
       <div class="bg-white p-4 rounded-md shadow">
         <p class="text-gray-500">Total Hours</p>
-        <h2 class="text-2xl font-bold">12.5</h2>
+        <h2 class="text-2xl font-bold">{{ summary.hours }}</h2>
       </div>
 
       <div class="bg-white p-4 rounded-md shadow">
         <p class="text-gray-500">Earnings</p>
-        <h2 class="text-2xl font-bold text-green-600">$250</h2>
+        <h2 class="text-2xl font-bold text-green-600">{{ formatMoney(summary.earnings) }}</h2>
       </div>
 
       <div class="bg-white p-4 rounded-md shadow">
         <p class="text-gray-500">Total project</p>
-        <h2 class="text-2xl font-bold">5</h2>
+        <h2 class="text-2xl font-bold">  {{ summary.projects }}</h2>
       </div>
-
-
-
 
 </div>
 

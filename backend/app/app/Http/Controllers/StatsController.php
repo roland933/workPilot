@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TimeEntry;
+use App\Models\Project;
 
 class StatsController
 {
@@ -97,5 +98,31 @@ class StatsController
                         ];
                     })
                     ->values();
-            }            
+            }
+            
+      public function summary()
+            {
+                $userId = auth()->id();
+
+                $entries = TimeEntry::with('project')
+                    ->where('user_id', $userId)
+                    ->whereNotNull('duration')
+                    ->get();
+
+                $totalSeconds = $entries->sum('duration');
+
+                $totalHours = round($totalSeconds / 3600, 2);
+
+                $earnings = $entries->sum(function ($entry) {
+                    return ($entry->duration / 3600) * $entry->project->hourly_rate;
+                });
+
+                $projectsCount = Project::where('user_id', $userId)->count();
+
+                return [
+                    'hours' => $totalHours,
+                    'earnings' => round($earnings, 2),
+                    'projects' => $projectsCount,
+                ];
+            }      
 }
