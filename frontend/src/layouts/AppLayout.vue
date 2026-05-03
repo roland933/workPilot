@@ -30,24 +30,24 @@ onMounted(async () => {
   <div class="flex h-screen bg-gray-100">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-gray-900 text-white flex flex-col">
+    <aside class="w-64 bg-white text-gray flex flex-col shadow-md">
 
-      <div class="p-6 text-lg font-bold border-b border-gray-700">
+      <div class="p-6 text-lg font-bold border-b border-gray-200 bg-gray-100">
         WorkPilot
       </div>
 
       <nav class="flex-1 p-4 space-y-2">
         <router-link 
           to="/dashboard"
-          :class="$route.path === '/dashboard'  ? 'bg-gray-700' : 'hover:bg-gray-700' "
-          class="block px-3 py-2 rounded hover:bg-gray-700">
+          :class="$route.path === '/dashboard'  ? 'bg-gray-300' : 'hover:bg-gray-200' "
+          class="block px-3 py-2 rounded">
           Dashboard
         </router-link>
 
         <router-link 
           to="/projects"
-           :class="$route.path === '/projects'  ? 'bg-gray-700' : 'hover:bg-gray-700' "
-          class="block px-3 py-2 rounded hover:bg-gray-700">
+           :class="$route.path === '/projects'  ? 'bg-gray-300' : 'hover:bg-gray-200' "
+          class="block px-3 py-2 rounded ">
           Projects
         </router-link>
       </nav>
@@ -58,7 +58,7 @@ onMounted(async () => {
     <div class="flex-1 flex flex-col">
 
       <!-- HEADER -->
-      <header class="bg-whit h-16 shadow-md">
+      <header class="bg-white  h-16 shadow-sm !border-l !border-gray-200">
 
         <div class="max-w-6xl mx-auto flex items-center justify-between h-full px-6">
 
