@@ -5,46 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\TimeEntry;
+use App\Services\InvoiceService;
 
 
 class InvoiceController
 {
-    public function downloadInvoice()
+    public function download()
         {
-            $entries = TimeEntry::with('project')
-                ->where('user_id', auth()->id())
-                ->whereNotNull('duration')
-                ->get();
+          $invoice = app(InvoiceService::class)->generate(auth()->id())
+                    ->download('invoice.pdf');
 
-            $total = $entries->sum(function ($e) {
-                return ($e->duration / 3600) * $e->project->hourly_rate;
-            });
-
-            $pdf = Pdf::loadView('invoice', [
-                'entries' => $entries,
-                'total' => $total,
-            ]);
-
-            return $pdf->download('invoice.pdf');
+          return $invoice;
         }
 
     public function preview(Request $request)
-            {
-                $query = TimeEntry::with('project')
-                    ->where('user_id', auth()->id())
-                    ->whereNotNull('duration');
+      {
+            $invoice = app(InvoiceService::class)->generate(auth()->id())
+                    ->stream();
 
-                $entries = $query->get();
-
-                $total = $entries->sum(function ($e) {
-                    return ($e->duration / 3600) * $e->project->hourly_rate;
-                });
-
-                $pdf = Pdf::loadView('invoice', [
-                    'entries' => $entries,
-                    'total' => $total,
-                ]);
-
-                return $pdf->stream();
-            }    
+            return $invoice;
+      }    
 }
