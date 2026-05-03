@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/projects', [ProjectController::class, 'index']);
 
     Route::get('/invoice', [InvoiceController::class, 'downloadInvoice']);
+    Route::get('/invoice/preview', [InvoiceController::class, 'preview']);
 
 
      Route::get('/user', function () {return auth()->user(); });

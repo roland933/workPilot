@@ -1,7 +1,7 @@
 <script setup>
 import { ref,onMounted } from "vue";
 import { useRouter } from "vue-router";
-
+import {setError} from "../stores/error.js"
 const router = useRouter();
 const showMenu = ref(false);
 
@@ -20,7 +20,7 @@ onMounted(async () => {
     const res = await api.get("/user");
     user.value = res.data;
   } catch (e) {
-    console.log(e);
+     setError("Hiba történt a felhasználó lekérése közben!")
   }
 });
 
@@ -58,7 +58,7 @@ onMounted(async () => {
     <div class="flex-1 flex flex-col">
 
       <!-- HEADER -->
-      <header class="bg-gray-100 h-16 shadow-md">
+      <header class="bg-whit h-16 shadow-md">
 
         <div class="max-w-6xl mx-auto flex items-center justify-between h-full px-6">
 

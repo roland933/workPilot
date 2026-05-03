@@ -122,8 +122,16 @@ const downloadInvoice = async () => {
   } finally {
     disabledGenerateInvoiceButton.value = false;
   }
-
 }
+
+const previewInvoice = async () => {
+  const res = await api.get("/invoice/preview",{
+    responseType: "blob"
+  });
+
+  const url = window.URL.createObjectURL(res.data);
+  window.open(url);
+};
 
 watch(activeTimer, (newVal) => {
   stopLiveTimer();
@@ -185,7 +193,15 @@ onMounted(async() => {
                   {{ disabledGenerateInvoiceButton ? "Generating..." : "Generate Invoice" }}
                 </button>
 
+        </div>
 
+        <div>
+
+                <button @click="previewInvoice"
+                          class="bg-white text-gray px-4 py-2 rounded shadow-md hover:bg-gray-300 w-[180px] transition disabled:cursor-not-allowed">
+                        Preview Invoice
+                </button>
+        
         </div>
 
 
