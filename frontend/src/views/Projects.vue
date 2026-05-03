@@ -169,7 +169,7 @@ onMounted(async() => {
         <div>
                 <button
               @click="showModal = true"
-              class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-400"
+              class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-400 w-[180px] transition"
                >
                + New Project
               </button>
@@ -179,9 +179,9 @@ onMounted(async() => {
                 <button
                 :disabled="disabledGenerateInvoiceButton"
                 @click="downloadInvoice"
-                class="bg-white text-gray px-4 py-2 rounded shadow-md hover:bg-gray-300"
+                class="bg-white text-gray px-4 py-2 rounded shadow-md hover:bg-gray-300 w-[180px] transition"
                   >
-                Generate invoice
+                  {{ disabledGenerateInvoiceButton ? "Generating..." : "Generate Invoice" }}
                 </button>
 
 
@@ -192,60 +192,88 @@ onMounted(async() => {
  
     <h1 class="text-2xl font-bold">Projects</h1>
 
+      <div class="bg-white rounded-xl shadow overflow-hidden">
 
-    
+  <table class="min-w-full text-sm">
 
-   
+    <!-- HEADER -->
+    <thead class="bg-gray-50 text-gray-600">
+      <tr>
+        <th class="text-left px-6 py-3 font-semibold">Project</th>
+        <th class="text-left px-6 py-3 font-semibold">Rate</th>
+        <th class="text-right px-6 py-3 font-semibold">Actions</th>
+      </tr>
+    </thead>
+
+    <!-- BODY -->
+    <tbody class="divide-y">
+
+      <tr
+        v-if="projects.length !== 0"
+        v-for="p in projects"
+        :key="p.id"
+        class="hover:bg-gray-50 transition"
+      >
+        <!-- NAME -->
+        <td class="px-6 py-4 text-left">
+          <p class="font-medium text-gray-800">{{ p.name }}</p>
+        </td>
+
+        <!-- RATE -->
+        <td class="px-6 py-4 text-gray-500 text-left">
+          ${{ p.hourly_rate }}/hour
+        </td>
+
+        <!-- ACTIONS -->
+        <td class="px-6 py-4 text-right">
+          <div class="flex justify-end gap-2">
+
+            <button 
+              :disabled="activeTimer && activeTimer?.id"
+              @click="start(p.id)"
+              class="bg-green-500 text-white px-3 py-1 rounded-md text-xs hover:bg-green-600 disabled:bg-green-300"
+            >
+              Start
+            </button>
+
+            <button 
+              :disabled="!activeTimer"
+              @click="stop"
+              class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 disabled:bg-red-400"
+            >
+              Stop
+            </button>
+
+            <button
+              :disabled="p.id == activeTimer?.project?.id"
+              @click="handleEditProject(p)"
+              class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs hover:bg-gray-500 disabled:bg-gray-300"
+            >
+              Edit
+            </button>
+
+            <button
+              :disabled="activeTimer && activeTimer?.id"
+              @click="deleteProject(p.id)"
+              class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs hover:bg-gray-500 disabled:bg-gray-400"
+            >
+              Delete
+            </button>
+
+          </div>
+        </td>
+
+      </tr>
+      <tr v-else>
+            <td class="p-5 text-center"> <div> No projects yet. Create your first one  </div></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+</div>
 
 
-    <div v-if="projects.length === 0" class="text-gray-500">
-      No projects yet. Create your first one
-    </div>    
-
-    <div class="bg-white rounded-xl shadow p-4" v-else>
-
-      <div v-for="p in projects" :key="p.id"
-           class="flex justify-between items-center py-3 border-b">
-
-        <div>
-          <p class="font-medium">{{ p.name }}</p>
-          <p class="text-sm text-gray-500">
-            ${{ p.hourly_rate }}/hour
-          </p>
-        </div>
-
-        <div class="space-x-2">
-          <button 
-          :disabled="activeTimer && activeTimer?.id"
-          @click="start(p.id)" class="bg-green-500 text-white px-2 py-1 rounded disabled:bg-green-300">
-            Start
-          </button>
-
-          <button 
-          :disabled="!activeTimer"
-          @click="stop(p.id)" class="bg-red-500 text-white px-2 py-1 rounded disabled:bg-red-400">
-            Stop
-          </button>
-
-          <button
-          :disabled="p.id == activeTimer?.project?.id"
-          @click="handleEditProject(p)" 
-          class="bg-yellow-500 text-white px-2 py-1 rounded">
-            Edit
-          </button>
-
-          <button
-           :disabled="activeTimer && activeTimer?.id"
-            @click="deleteProject(p.id)"
-            class="bg-red-500 text-white px-2 py-1 rounded disabled:bg-red-400"
-          >
-            Delete
-          </button>
-        </div>
-
-      </div>
-
-    </div>
 
   </div>
 </template>
