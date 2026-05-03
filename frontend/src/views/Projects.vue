@@ -212,6 +212,10 @@ onMounted(async() => {
         v-if="projects.length !== 0"
         v-for="p in projects"
         :key="p.id"
+        :class="[
+          'hover:bg-gray-50 transition',
+          p.id === activeTimer?.project?.id ? 'bg-yellow-50' : ''
+        ]"
         class="hover:bg-gray-50 transition"
       >
         <!-- NAME -->
@@ -238,7 +242,7 @@ onMounted(async() => {
 
             <button 
               :disabled="!activeTimer"
-              @click="stop"
+              @click="stop(p.id)"
               class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 disabled:bg-red-400"
             >
               Stop

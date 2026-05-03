@@ -1,16 +1,29 @@
 <script setup>
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const showMenu = ref(false);
+
+import api from "../api";
+
+const user = ref(null);
 
 const logout = () => {
   localStorage.removeItem("token");
   router.push("/");
 };
 
-const userEmail = "demo@email.com";
+
+onMounted(async () => {
+  try {
+    const res = await api.get("/user");
+    user.value = res.data;
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 </script>
 
 <template>
@@ -61,11 +74,11 @@ const userEmail = "demo@email.com";
               @click="showMenu = !showMenu"
             >
               <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                {{ userEmail.charAt(0).toUpperCase() }}
+                {{ user?.email.charAt(0).toUpperCase() }}
               </div>
 
               <span class="text-sm text-gray-600">
-                {{ userEmail }}
+                {{  user?.email }}
               </span>
             </div>
 
