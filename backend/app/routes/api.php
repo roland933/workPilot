@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TimeEntryController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\InvoiceController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -28,8 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/stats/projects', [StatsController::class, 'projectBreakdown']);
     Route::put('/projects/{id}', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
- 
+    
     Route::get('/projects', [ProjectController::class, 'index']);
+
+    Route::get('/invoice', [InvoiceController::class, 'downloadInvoice']);
 });
 
 

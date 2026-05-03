@@ -16,6 +16,7 @@ const elapsed = ref(0);
 
 const editProject = ref(null);
 const loadingBtn = ref(false);
+const disabledGenerateInvoiceButton = ref(false);
 
 let interval = null;
 
@@ -103,6 +104,27 @@ const handleEditProject = (p) => {
     editProject.value = p;
 }
 
+const downloadInvoice = async () => {
+  disabledGenerateInvoiceButton.value = true;
+  try {
+  const res = await api.get("/invoice", {
+    responseType: "blob"
+  });
+
+  const url = window.URL.createObjectURL(new Blob([res.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "invoice.pdf");
+  document.body.appendChild(link);
+  link.click();
+  } catch(err) {
+    setError(err.response?.data?.message || 'Nem sikerült a számla generálás!')
+  } finally {
+    disabledGenerateInvoiceButton.value = false;
+  }
+
+}
+
 watch(activeTimer, (newVal) => {
   stopLiveTimer();
 
@@ -142,16 +164,39 @@ onMounted(async() => {
               {{ formatTime(elapsed) }}
             </p>
         </div>
+
+    <div class="actions flex gap-4">
+        <div>
+                <button
+              @click="showModal = true"
+              class="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-400"
+               >
+               + New Project
+              </button>
+        </div>
+
+        <div>
+                <button
+                :disabled="disabledGenerateInvoiceButton"
+                @click="downloadInvoice"
+                class="bg-white text-gray px-4 py-2 rounded shadow-md hover:bg-gray-300"
+                  >
+                Generate invoice
+                </button>
+
+
+        </div>
+
+
+    </div>    
  
     <h1 class="text-2xl font-bold">Projects</h1>
 
 
-        <button
-      @click="showModal = true"
-      class="bg-blue-500 text-white px-4 py-2 rounded"
-    >
-      + New Project
-    </button>
+    
+
+   
+
 
     <div v-if="projects.length === 0" class="text-gray-500">
       No projects yet. Create your first one
