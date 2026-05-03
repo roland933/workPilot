@@ -177,9 +177,10 @@ onMounted(async() => {
 
         <div>
                 <button
-                :disabled="disabledGenerateInvoiceButton"
+                :disabled="disabledGenerateInvoiceButton || projects.length === 0"
+                :title="projects.length === 0 ? 'Not projects yet': ''"
                 @click="downloadInvoice"
-                class="bg-white text-gray px-4 py-2 rounded shadow-md hover:bg-gray-300 w-[180px] transition"
+                class="bg-white text-gray px-4 py-2 rounded shadow-md hover:bg-gray-300 w-[180px] transition disabled:cursor-not-allowed"
                   >
                   {{ disabledGenerateInvoiceButton ? "Generating..." : "Generate Invoice" }}
                 </button>
