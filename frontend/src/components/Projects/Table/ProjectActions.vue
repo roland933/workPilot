@@ -37,6 +37,8 @@
 </template>
 
 <script setup>
+const emit = defineEmits(['start','stop','edit','delete']);
+
 defineProps({
   project: Object,
   activeTimer: Object

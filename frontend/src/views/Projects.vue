@@ -6,7 +6,7 @@ import ProjectEditModal from "../components/Projects/ProjectEditModal.vue";
 import {setError} from "../stores/error.js"
 import { activeTimer, loadActiveTimer } from "../stores/timer";
 import ProjectTable from "../components/Projects/Table/ProjectTable.vue"
-
+import {formatTime} from "../js/utils/utils.js";
 
 const projects = ref([]);
 
@@ -20,14 +20,6 @@ const loadingBtn = ref(false);
 const disabledGenerateInvoiceButton = ref(false);
 
 let interval = null;
-
-const formatTime = (sec) => {
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-
-  return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-};
 
 const startLiveTimer = () => {
   if (!activeTimer.value || !activeTimer.value.start_time) return;
@@ -163,7 +155,7 @@ onMounted(async() => {
     </Teleport>
 
   <div class="space-y-6">
-       <div v-if="activeTimer && activeTimer.id"
+       <div v-if="activeTimer && activeTimer?.project_id"
             class="bg-yellow-50 border border-yellow-200 p-4 rounded-2xl mb-6">
 
             <p class="text-sm text-yellow-700">Active Timer</p>

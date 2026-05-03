@@ -1,5 +1,9 @@
 <template>
-  <tr :class="rowClass">
+ <tr :class="[
+  'transition',
+  isActive ? 'bg-yellow-50' : '',
+  isDisabled ? 'opacity-50 pointer-events-none' : 'hover:bg-gray-50'
+]">
 
     <td class="px-6 py-4 text-left">
       <p class="font-medium">{{ project.name }}</p>
@@ -34,8 +38,17 @@ const props = defineProps({
 });
 
 const rowClass = computed(() =>
-  props.project.id === props.activeTimer?.project?.id
+  props.project.id === props.activeTimer?.project_id
     ? 'bg-yellow-50'
     : 'hover:bg-gray-50'
 );
+
+const isActive = computed(() =>
+  props.project.id === props.activeTimer?.project_id
+);
+
+const isDisabled = computed(() =>
+  props.activeTimer && !isActive.value
+);
+
 </script>
