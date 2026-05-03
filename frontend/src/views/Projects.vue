@@ -5,6 +5,7 @@ import ProjectCreateModal from "../components/Projects/ProjectCreateModal.vue";
 import ProjectEditModal from "../components/Projects/ProjectEditModal.vue";
 import {setError} from "../stores/error.js"
 import { activeTimer, loadActiveTimer } from "../stores/timer";
+import ProjectTable from "../components/Projects/Table/ProjectTable.vue"
 
 
 const projects = ref([]);
@@ -211,86 +212,15 @@ onMounted(async() => {
 
       <div class="bg-white rounded-xl shadow overflow-hidden">
 
-  <table class="min-w-full text-sm">
+                  <ProjectTable
+                      :projects="projects"
+                      :activeTimer="activeTimer"
+                      @start="start"
+                      @stop="stop"
+                      @edit="handleEditProject"
+                      @delete="deleteProject"
+            />
 
-    <!-- HEADER -->
-    <thead class="bg-gray-50 text-gray-600">
-      <tr>
-        <th class="text-left px-6 py-3 font-semibold">Project</th>
-        <th class="text-left px-6 py-3 font-semibold">Rate</th>
-        <th class="text-right px-6 py-3 font-semibold">Actions</th>
-      </tr>
-    </thead>
-
-    <!-- BODY -->
-    <tbody class="divide-y">
-
-      <tr
-        v-if="projects.length !== 0"
-        v-for="p in projects"
-        :key="p.id"
-        :class="[
-          'hover:bg-gray-50 transition',
-          p.id === activeTimer?.project?.id ? 'bg-yellow-50' : ''
-        ]"
-        class="hover:bg-gray-50 transition"
-      >
-        <!-- NAME -->
-        <td class="px-6 py-4 text-left">
-          <p class="font-medium text-gray-800">{{ p.name }}</p>
-        </td>
-
-        <!-- RATE -->
-        <td class="px-6 py-4 text-gray-500 text-left">
-          ${{ p.hourly_rate }}/hour
-        </td>
-
-        <!-- ACTIONS -->
-        <td class="px-6 py-4 text-right">
-          <div class="flex justify-end gap-2">
-
-            <button 
-              :disabled="activeTimer && activeTimer?.id"
-              @click="start(p.id)"
-              class="bg-green-500 text-white px-3 py-1 rounded-md text-xs hover:bg-green-600 disabled:bg-green-300"
-            >
-              Start
-            </button>
-
-            <button 
-              :disabled="!activeTimer"
-              @click="stop(p.id)"
-              class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 disabled:bg-red-400"
-            >
-              Stop
-            </button>
-
-            <button
-              :disabled="p.id == activeTimer?.project?.id"
-              @click="handleEditProject(p)"
-              class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs hover:bg-gray-500 disabled:bg-gray-300"
-            >
-              Edit
-            </button>
-
-            <button
-              :disabled="activeTimer && activeTimer?.id"
-              @click="deleteProject(p.id)"
-              class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs hover:bg-gray-500 disabled:bg-gray-400"
-            >
-              Delete
-            </button>
-
-          </div>
-        </td>
-
-      </tr>
-      <tr v-else>
-            <td class="p-5 text-center"> <div> No projects yet. Create your first one  </div></td>
-      </tr>
-
-    </tbody>
-  </table>
 
 </div>
 
