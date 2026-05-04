@@ -2,7 +2,7 @@
  <tr :class="[
   'transition',
   isActive ? 'bg-yellow-50' : '',
-  isDisabled ? 'opacity-80 pointer-events-none' : 'hover:bg-gray-50'
+  isDisabled ? 'opacity-25 pointer-events-none' : 'hover:bg-gray-50'
 ]">
 
     <td class="px-6 py-4 text-left">
