@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted,watch } from "vue";
+import { ref, onMounted,watch,reactive } from "vue";
 import api from "../api";
 import ProjectCreateModal from "../components/Projects/ProjectCreateModal.vue";
 import ProjectEditModal from "../components/Projects/ProjectEditModal.vue";
@@ -18,6 +18,12 @@ const elapsed = ref(0);
 const editProject = ref(null);
 const loadingBtn = ref(false);
 const disabledGenerateInvoiceButton = ref(false);
+const page = ref(1);
+const search = ref("");
+const pagination = reactive({
+  last_page:1
+
+});
 
 let interval = null;
 
@@ -45,9 +51,22 @@ const stopLiveTimer = () => {
 
 
 const load = async () => {
-  const res = await api.get("/projects");
-  projects.value = res.data;
+  try {
+  const res = await api.get("/projects", {
+    params: {
+      search: search.value,
+      page: page.value
+    }
+  });
+
+  projects.value = res.data.data;
+  pagination.last_page = res.data.last_page;
+ 
+  } catch(err) {
+    setError("Nem sikerült a projektek lekérése!");
+  }
 };
+
 
 const deleteProject = async (id) => {
   if (!confirm("Delete project?")) return;
@@ -202,7 +221,7 @@ onMounted(async() => {
  
     <h1 class="text-2xl font-bold">Projects</h1>
 
-      <div class="bg-white rounded-xl shadow overflow-hidden">
+      <div class="rounded-xl shadow overflow-hidden">
 
                   <ProjectTable
                       :projects="projects"
@@ -213,6 +232,27 @@ onMounted(async() => {
                       @delete="deleteProject"
             />
 
+            <div class="flex justify-center gap-2 mt-4  !mb-5">
+
+              <button
+                @click="page--, load()"
+                :disabled="page === 1"
+                class="px-3 py-1 border rounded bg-white"
+              >
+                Prev
+              </button>
+
+              <span>Page {{ page }} / {{ pagination?.last_page }}</span>
+
+              <button
+                @click="page++, load()"
+                :disabled="page === pagination?.last_page"
+                class="px-3 py-1 border rounded bg-white"
+              >
+                Next
+              </button>
+
+            </div>
 
 </div>
 
