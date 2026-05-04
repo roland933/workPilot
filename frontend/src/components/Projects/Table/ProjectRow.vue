@@ -1,9 +1,5 @@
 <template>
- <tr :class="[
-  'transition',
-  isActive ? 'bg-yellow-50' : '',
-  isDisabled ? 'opacity-50 pointer-events-none' : 'hover:bg-gray-50'
-]">
+ <tr :class="rowClass">
 
     <td class="px-6 py-4 text-left">
       <p class="font-medium">{{ project.name }}</p>

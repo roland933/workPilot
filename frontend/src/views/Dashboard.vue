@@ -7,6 +7,7 @@ import ProjectList from "../components/Projects/ProjectList.vue";
 import PieChart from "../components/Charts/PieChart.vue";
 import { setError } from "../stores/error";
 import { formatMoney } from "../js/utils/utils";
+import ProjectStatsTable from "../components/Projects/StatsTable/ProjectStatsTable.vue"
 
 const summary = ref({
   hours: 0,
@@ -85,12 +86,10 @@ onMounted(async () => {
     <div class="mb-8">
       <h2 class="text-xl font-semibold mb-2">Stats</h2>
 
-      <div v-for="item in stats" :key="item.project"
-           class="bg-white p-4 mb-2 rounded shadow">
-        <h3 class="font-bold">{{ item.project }}</h3>
-        <p>Hours: {{ item.hours }}</p>
-        <p class="text-green-600">Earnings: ${{ item.earnings }}</p>
-      </div>
+      <ProjectStatsTable :projects="stats"/>
+      
+
+     
     </div>
       
 
