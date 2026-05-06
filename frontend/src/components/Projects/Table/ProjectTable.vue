@@ -22,6 +22,7 @@ const props = defineProps({
 
       <tbody class="divide-y">
         <ProjectRow
+          v-if="projects?.length !==  0"
           v-for="p in projects"
           :key="p.id"
           :project="p"
@@ -31,6 +32,9 @@ const props = defineProps({
           @edit="$emit('edit', $event)"
           @delete="$emit('delete', $event)"
         />
+         <tr v-else>
+            <div class="p-5">Not project yet</div>
+        </tr>
       </tbody>
 
     </table>

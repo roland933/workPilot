@@ -232,7 +232,7 @@ onMounted(async() => {
                       @delete="deleteProject"
             />
 
-            <div class="flex justify-center gap-2 mt-4  !mb-5">
+            <div class="flex justify-center gap-2 mt-4  !mb-5 " :class="projects.length === 0 ? 'opacity-40 cursor-not-allowed': ''">
 
               <button
                 @click="page--, load()"
