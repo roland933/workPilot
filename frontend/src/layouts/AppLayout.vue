@@ -60,17 +60,17 @@ onMounted(async () => {
       <!-- HEADER -->
       <header class="bg-white  h-16 shadow-sm !border-l !border-gray-200">
 
-        <div class="max-w-6xl mx-auto flex items-center justify-between h-full px-6">
+        <div class="max-w-6xl mx-auto flex items-center justify-between h-full">
 
           <div >
            
           </div>
 
           <!-- USER -->
-          <div class="relative">
+          <div class="relative bg-gray-100 h-full p-4">
 
             <div
-              class="flex items-center gap-3 cursor-pointer"
+              class="flex items-center gap-3 cursor-pointer "
               @click="showMenu = !showMenu"
             >
               <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
