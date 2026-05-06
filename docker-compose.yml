@@ -28,7 +28,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: workpilot
     ports:
       - "3306:3306"
 
