@@ -8,10 +8,18 @@ use App\Models\Project;
 
 class ProjectController
 {
-   public function index()
+   public function index(Request $request)
     {   
         
-        return auth()->user()->projects;
+       $query = Project::where('user_id', auth()->id());
+
+   
+        if ($request->search) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+          }
+
+  
+        return $query->orderBy('id', 'desc')->paginate(3);
     }
 
     public function store(Request $request)
